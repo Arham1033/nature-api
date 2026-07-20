@@ -1,35 +1,35 @@
 const express = require("express");
+require("dotenv").config();
+const mongoose = require("mongoose");
+
+const Destination = require("./models/Destination");
 
 const app = express();
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
 app.use(express.static("public"));
 
-const contacts = [
-  {
-    id: 1,
-    name: "Ali",
-    email: "ali@gmail.com",
-    destination: "Forest",
-    message: "Beautiful place!"
-  },
-  {
-    id: 2,
-    name: "Sara",
-    email: "sara@gmail.com",
-    destination: "Mountain",
-    message: "Amazing view!"
-  }
-];
+mongoose
+.connect(process.env.MONGODB_URI)
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
 
-app.get("/api/contact", (req, res) => {
-  res.status(200).json(contacts);
+
+app.get("/api/destination", async (req, res) => {
+  try {
+    const contacts = await Destination.find();
+    res.status(200).json(contacts);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
 });
 
-app.post("/api/contact", (req, res) => {
+app.post("/api/destination", async (req, res) => {
 
   const { name, email, destination, message } = req.body;
 
@@ -50,21 +50,44 @@ if (!email) {
     });
   }
 
-  const newContact = {
-  id: contacts.length + 1,
+  const newContact = await Destination.create({
+
   name,
   email,
   destination,
   message,
-};
 
-contacts.push(newContact);
-
+});
 
 res.status(201).json({
   message: "Contact added successfully",
   contact: newContact,
 });
+});
+
+app.put("/api/destination/:id", async (req, res) => {
+
+  const updated = await Destination.findByIdAndUpdate(
+
+    req.params.id,
+
+    req.body,
+
+    { new: true }
+
+  );
+
+  res.json(updated);
+
+});
+
+app.delete("/api/destination/:id", async (req, res) => {
+
+  await Destination.findByIdAndDelete(req.params.id);
+
+  res.json({
+    message: "Deleted Successfully"
+  });
 
 });
 
