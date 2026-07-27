@@ -30,41 +30,39 @@ app.get("/api/destination", async (req, res) => {
 });
 
 app.post("/api/destination", async (req, res) => {
+  try {
+    const { name, email, destination, message } = req.body;
 
-  const { name, email, destination, message } = req.body;
+    if (!name) {
+      return res.status(400).json({
+        message: "Name is required",
+      });
+    }
 
-  console.log(name);
-  console.log(email);
-  console.log(destination);
-  console.log(message);
+    if (!email) {
+      return res.status(400).json({
+        message: "Email is required",
+      });
+    }
 
+    const newContact = await Destination.create({
+      name,
+      email,
+      destination,
+      message,
+    });
 
-if (!name) {
-    return res.status(400).json({
-      message: "Name is required"
+    res.status(201).json({
+      message: "Contact added successfully",
+      contact: newContact,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
     });
   }
-if (!email) {
-    return res.status(400).json({
-      message: "Email is required"
-    });
-  }
-
-  const newContact = await Destination.create({
-
-  name,
-  email,
-  destination,
-  message,
-
 });
-
-res.status(201).json({
-  message: "Contact added successfully",
-  contact: newContact,
-});
-});
-
 app.put("/api/destination/:id", async (req, res) => {
 
   const updated = await Destination.findByIdAndUpdate(
