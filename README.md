@@ -154,7 +154,7 @@ This project demonstrates:
 
 ---
 
-## 👨‍💻 Author
+## 👨🏻‍💻 Author
 
 **Muhammad Arham**
 
